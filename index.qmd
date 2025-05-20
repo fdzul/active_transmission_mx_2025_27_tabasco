@@ -10,7 +10,7 @@ theme: custom.scss
 library(sf)
 mapview::mapviewOptions(default = TRUE,
                         basemaps.color.shuffle = FALSE)
-load("/Users/felipedzul/Library/CloudStorage/OneDrive-Personal/proyects/geocoding_mex/2025/8.RData/denmex_2025.RData")
+load("/Users/felipedzul/OneDrive/proyects/geocoding_mex/2025/8.RData/denmex_2025.RData")
 library(magrittr)
 ```
 
@@ -22,10 +22,34 @@ library(magrittr)
 ### Villahermosa
 
 ```{r villa}
-denhotspots::transmission_chains_map(geocoded_dataset = z,
-                                     cve_edo = "27",
-                                     locality = "Villahermosa",
-                                     dengue_cases = "Probable")
+geocoded_dataset <- z |>
+    dplyr::mutate(onset = FEC_INI_SIGNOS_SINT) |>
+    dplyr::mutate(x = long,
+                  y = lat) |>
+    sf::st_as_sf(coords = c("long", "lat"),
+                 crs = 4326) |>
+    dplyr::select(DES_MPO_RES,VEC_ID, onset, SEM, ESTATUS_CASO, x, y,
+                  DENGUE_SER_TRIPLEX, DES_DIAG_FINAL, IDE_EDA_ANO) |>
+    dplyr::mutate(ESTATUS_CASO = ifelse(ESTATUS_CASO == 2,
+                                        "Confirmado",
+                                        "Probable"))
+loc <- rgeomex::extract_locality(cve_edo = "27",
+                                 locality = "VillaHermosa")
+geocoded_dataset <- geocoded_dataset[loc, ]
+
+x <- denhotspots::knox(x = geocoded_dataset,
+                       crs = "+proj=eqc",
+                       ds = 400, # distance in meters
+                       dt = 20,  # days 0 to 20 day
+                       sym = 1000,
+                       sp_link = FALSE, # for sf
+                       planar_coord = FALSE)
+
+denhotspots::space_time_link_map(x =x,
+                                 locality = "Villahermosa",
+                                 cve_edo = "27",
+                                 maptype = "interactive_map")
+
 ```
 
 :::
@@ -38,15 +62,15 @@ denhotspots::transmission_chains_map(geocoded_dataset = z,
 ### Villahermosa
 ```{r heatmap_villa}
 densnv::mp_heatmap(geocoded_datasets = z,
-                   cve_edo = "27",
-                   locality = "Villahermosa",
-                   status_caso = c(1, 2),
-                   week = c(1:53),
-                   zoom = NULL,
-                   map_type = NULL,
-                   alpha = 0.6,
-                   static = FALSE,
-                   palette = viridis::turbo)
+                                    cve_edo = "27",
+                                    locality = "Villahermosa",
+                                    status_caso = c(1, 2),
+                                    week = c(1:53),
+                                    zoom = NULL,
+                                    map_type = NULL,
+                                    alpha = 0.6,
+                                    static = FALSE,
+                                    palette = viridis::turbo)
 ```
 
 :::
