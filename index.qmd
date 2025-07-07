@@ -10,7 +10,8 @@ theme: custom.scss
 library(sf)
 mapview::mapviewOptions(default = TRUE,
                         basemaps.color.shuffle = FALSE)
-load("/Users/felipedzul/OneDrive/proyects/geocoding_mex/2025/8.RData/denmex_2025.RData")
+#load("/Users/felipedzul/OneDrive/proyects/geocoding_mex/2025/8.RData/denmex_2025.RData")
+load("~/Documents/geocoding_mx/2025/8.RData/denmex_2025.RData")
 library(magrittr)
 ```
 
@@ -61,7 +62,7 @@ denhotspots::space_time_link_map(x =x,
 
 ### Villahermosa
 ```{r heatmap_villa}
-densnv::mp_heatmap(geocoded_datasets = z,
+densnv::mp_heatmap(geocoded_dataset = z,
                                     cve_edo = "27",
                                     locality = "Villahermosa",
                                     status_caso = c(1, 2),
